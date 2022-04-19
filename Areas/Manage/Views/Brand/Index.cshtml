@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Brand>
+@{
+    ViewData["Title"] = "Index";
+    int count = 0;
+}
+
+<div class="row">
+
+    <div class="col-lg-10">
+        <h1>Tags</h1>
+    </div>
+    <div class="col-lg-2">
+        <a asp-action="Create" asp-area="Manage" class="btn btn-primary">Create</a>
+    </div>
+    <div class="col-lg-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Setting</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Brand brand in Model)
+                {
+                    count++;
+                    <tr>
+                        <th scope="row">@count</th>
+                        <td>@brand.Name</td>
+                        <td style="color:@(brand.IsDeleted ? "red":"green")">@(brand.IsDeleted ? "Deactive":"Active")</td>
+                        <td>
+                            <a class="btn btn-warning" asp-action="Update" asp-route-id="@brand.Id">Update</a>
+                            <a class="btn @(brand.IsDeleted ? "btn-primary":"btn-danger")" asp-action="@(brand.IsDeleted ?"Restore":"Delete")" asp-route-id="@brand.Id">@(brand.IsDeleted ?"Restore":"Delete")</a>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+

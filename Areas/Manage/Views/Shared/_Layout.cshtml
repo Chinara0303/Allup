@@ -12,6 +12,7 @@
     <title>SB Admin 2 - Dashboard</title>
 
     <!-- Custom fonts for this template-->
+    <script src="~/manage/js/ckeditor/ckeditor.js"></script>
     <link href="~/manage/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
@@ -56,7 +57,20 @@
                     <span>Setting</span>
                 </a>
             </li>
-
+            <hr class="sidebar-divider my-0" />
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index" asp-controller="Tag" asp-area="Manage">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Tag</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider my-0" />
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index" asp-controller="Brand" asp-area="Manage">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Brand</span>
+                </a>
+            </li>
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
