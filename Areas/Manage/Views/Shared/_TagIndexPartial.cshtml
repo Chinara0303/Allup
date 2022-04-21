@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Tag>
+@{
+    int count = 0;
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Setting</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Tag tag in Model)
+        {
+            count++;
+            <tr>
+                <th scope="row">@count</th>
+                <td>@tag.Name</td>
+                <td style="color:@(tag.IsDeleted ? " red":"green")">@(tag.IsDeleted ? "Deactive":"Active")</td>
+                <td>
+                    <a class="btn btn-warning" asp-action="Update" asp-route-id="@tag.Id">Update</a>
+                    <a id="@(tag.IsDeleted ? "restoretag":"deletetag")" class="btn @(tag.IsDeleted ? " btn-primary":"btn-danger")" asp-action="@(tag.IsDeleted ?" Restore":"Delete")" asp-route-id="@tag.Id">@(tag.IsDeleted ?"Restore":"Delete")</a>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

@@ -120,7 +120,7 @@ namespace Allup.Areas.Manage.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            return PartialView("_TagIndexPartial", await _context.Tags.OrderByDescending(t => t.CreatedAt).ToListAsync());
         }
         public async Task<IActionResult> Restore(int? id)
         {
@@ -136,7 +136,7 @@ namespace Allup.Areas.Manage.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            return PartialView("_TagIndexPartial", await _context.Tags.OrderByDescending(t => t.CreatedAt).ToListAsync());
         }
     }
 }
