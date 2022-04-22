@@ -18,9 +18,21 @@ namespace Allup.Areas.Manage.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool? status, int page = 1)
         {
-            return View(await _context.Brands.OrderByDescending(b=>b.CreatedAt).ToListAsync());
+            ViewBag.Status = status;
+            IEnumerable<Brand> brands = await _context.Brands
+                .Include(b => b.Products)
+                .Where(b => status != null ? b.IsDeleted == status : true)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.PageIndex = page;
+            ViewBag.PageCount = Math.Ceiling((double)brands.Count() / 5);
+
+            return View(brands.Skip((page - 1) * 5).Take(5));
+
+            
         }
         public async Task<IActionResult> Create()
         {
@@ -55,7 +67,7 @@ namespace Allup.Areas.Manage.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Update(int? id)
+        public async Task<IActionResult> Update(int? id,bool? status,int page=1)
         {
             if (id == null) return BadRequest();
 
@@ -67,7 +79,7 @@ namespace Allup.Areas.Manage.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int? id, Brand brand)
+        public async Task<IActionResult> Update(int? id, Brand brand,bool? status,int page=1)
         {
             if (!ModelState.IsValid) return View();
 
@@ -96,10 +108,21 @@ namespace Allup.Areas.Manage.Controllers
             dbbrand.Name = brand.Name;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            ViewBag.Status = status;
+
+            IEnumerable<Brand> brands = await _context.Brands
+                .Include(b => b.Products)
+                .Where(b => status != null ? b.IsDeleted == status : true)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.PageIndex = page;
+            ViewBag.PageCount = Math.Ceiling((double)brands.Count()/5);
+            
+            return RedirectToAction("Index",new { status=status,page=page});
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id,bool? status, int page=1)
         {
             if (!ModelState.IsValid) return View();
 
@@ -114,9 +137,21 @@ namespace Allup.Areas.Manage.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+
+            ViewBag.Status = status;
+
+            IEnumerable<Brand> brands = await _context.Brands
+                .Include(b => b.Products)
+                .Where(b => status != null ? b.IsDeleted == status : true)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.PageIndex = page;
+            ViewBag.PageCount = Math.Ceiling((double)brands.Count() / 5);
+
+            return PartialView("_BrandIndexPartial",brands.Skip((page-1)*5).Take(5));
         }
-        public async Task<IActionResult> Restore(int? id)
+        public async Task<IActionResult> Restore(int? id,bool? status, int page=1)
         {
             if (!ModelState.IsValid) return View();
 
@@ -130,7 +165,20 @@ namespace Allup.Areas.Manage.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            ViewBag.Status = status;
+
+            IEnumerable<Brand> brands = await _context.Brands
+                .Include(b => b.Products)
+                .Where(b => status != null ? b.IsDeleted == status : true)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.PageIndex = page;
+            ViewBag.PageCount = Math.Ceiling((double)brands.Count() / 5);
+
+            return PartialView("_BrandIndexPartial", brands.Skip((page - 1) * 5).Take(5));
+
+          
         }
     }
 }

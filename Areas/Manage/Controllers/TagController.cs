@@ -18,14 +18,26 @@ namespace Allup.Areas.Manage.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool? status,int page = 1)
         {
-            return View(await _context.Tags.OrderByDescending(t => t.CreatedAt).ToListAsync());
+            ViewBag.Status = status;
+           
+           IEnumerable<Tag> tags= await _context.Tags
+                .Include(t=>t.ProductTags)
+                .Where(t=>status !=null ? t.IsDeleted==status:true)
+                .OrderByDescending(t => t.CreatedAt)
+                .ToListAsync();
+
+            ViewBag.PageIndex = page;
+            ViewBag.PageCount = Math.Ceiling((double)tags.Count() / 5);
+
+            return View(tags.Skip((page - 1) * 5).Take(5)); 
         }
         public async Task<IActionResult> Create()
         {
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Tag tag)
@@ -51,13 +63,16 @@ namespace Allup.Areas.Manage.Controllers
                 ModelState.AddModelError("Name", "Artiq movcuddur");
                 return View();
             }
+
+            tag.CreatedAt = DateTime.UtcNow.AddHours(4);
+
             await _context.Tags.AddAsync(tag);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Update(int? id)
+        public async Task<IActionResult> Update(int? id, bool? status, int page = 1)
         {
             if (id == null) return BadRequest();
             Tag tag = await _context.Tags.FirstOrDefaultAsync(t => t.Id == id);
@@ -68,7 +83,7 @@ namespace Allup.Areas.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int? id, Tag tag)
+        public async Task<IActionResult> Update(int? id, Tag tag, bool? status,int page=1)
         {
             if (!ModelState.IsValid) return View();
 
@@ -102,10 +117,10 @@ namespace Allup.Areas.Manage.Controllers
             dbtag.Name = tag.Name;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { status = status, page = page });
         }
        
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id,bool? status, int page=1)
         {
             if (!ModelState.IsValid) return View();
 
@@ -120,9 +135,21 @@ namespace Allup.Areas.Manage.Controllers
 
             await _context.SaveChangesAsync();
 
-            return PartialView("_TagIndexPartial", await _context.Tags.OrderByDescending(t => t.CreatedAt).ToListAsync());
+            ViewBag.Status = status;
+
+            IEnumerable<Tag> tags = await _context.Tags.
+                 Include(t => t.ProductTags)
+                 .Where(t => status != null ? t.IsDeleted == status : true)
+                 .OrderByDescending(t => t.CreatedAt)
+                 .ToListAsync();
+
+            ViewBag.PageIndex = page;
+            ViewBag.PageCount = Math.Ceiling((double)tags.Count() / 5);
+
+
+            return PartialView("_TagIndexPartial", tags.Skip((page-1)*5).Take(5));
         }
-        public async Task<IActionResult> Restore(int? id)
+        public async Task<IActionResult> Restore(int? id,bool? status, int page=1)
         {
             if (!ModelState.IsValid) return View();
 
@@ -136,7 +163,18 @@ namespace Allup.Areas.Manage.Controllers
 
             await _context.SaveChangesAsync();
 
-            return PartialView("_TagIndexPartial", await _context.Tags.OrderByDescending(t => t.CreatedAt).ToListAsync());
+            ViewBag.Status = status;
+
+            IEnumerable<Tag> tags = await _context.Tags.
+                 Include(t => t.ProductTags)
+                 .Where(t => status != null ? t.IsDeleted == status : true)
+                 .OrderByDescending(t => t.CreatedAt)
+                 .ToListAsync();
+            ViewBag.PageIndex = page;
+            ViewBag.PageCount = Math.Ceiling((double)tags.Count() / 5);
+
+
+            return PartialView("_TagIndexPartial", tags.Skip((page - 1) * 5).Take(5));
         }
     }
 }

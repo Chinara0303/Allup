@@ -10,5 +10,7 @@ namespace Allup.Models
     {
         [StringLength(255),Required]
         public string Name { get; set; }
+        public IEnumerable<ProductTag> ProductTags { get; set; }
+
     }
 }
